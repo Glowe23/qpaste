@@ -24,6 +24,8 @@ The existing workflow remains available, including selection, annotations, magni
 
 The important part was not adding another drawing tool. It was keeping physical desktop pixels, logical window coordinates, canvas coordinates, and image pixels aligned across different monitor layouts and scale factors. The repository includes [multi-monitor implementation notes](MULTI_MONITOR_NOTES.md) describing those boundaries.
 
+Technical details: [engineering evidence](docs/ENGINEERING_EVIDENCE.md), [coordinate systems and limitations](docs/COORDINATES_AND_LIMITATIONS.md), [testing and decisions](docs/TESTING_AND_DECISIONS.md), and [portfolio evidence](docs/PORTFOLIO_EVIDENCE.md).
+
 ## Technology
 
 - Tauri 2
