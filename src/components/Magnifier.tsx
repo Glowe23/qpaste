@@ -9,23 +9,8 @@ export const Magnifier = () => {
 
   if (!showMagnifier || !cursorPos || images.length === 0) return null;
 
-  const dpr = window.devicePixelRatio || 1;
-  const screenX = cursorPos.x + window.screenX;
-  const screenY = cursorPos.y + window.screenY;
-
-  // Find which capture the cursor is in (compare in logical pixels)
-  const captureIndex = captures.findIndex(cap => {
-    const capX = cap.x / dpr;
-    const capY = cap.y / dpr;
-    const capW = cap.width / dpr;
-    const capH = cap.height / dpr;
-    return screenX >= capX && screenX < capX + capW && screenY >= capY && screenY < capY + capH;
-  });
-
-  if (captureIndex === -1) return null;
-
-  const capture = captures[captureIndex];
-  const image = images[captureIndex];
+  const capture = captures[0];
+  const image = images[0];
 
   if (!image) return null;
 
@@ -38,11 +23,8 @@ export const Magnifier = () => {
   const radius = magnifierSize;
   const offset = 20;
 
-  // Calculate local position in the image (physical pixels)
-  // screenX * dpr converts logical screen coord to physical
-  // capture.x is already physical
-  const localX = screenX * dpr - capture.x;
-  const localY = screenY * dpr - capture.y;
+  const localX = cursorPos.x * capture.scale_factor;
+  const localY = cursorPos.y * capture.scale_factor;
 
   let mx = cursorPos.x + offset + radius;
   let my = cursorPos.y + offset + radius;
@@ -67,7 +49,7 @@ export const Magnifier = () => {
         radius={radius}
         fillPatternImage={image}
         fillPatternOffset={{ x: localX, y: localY }}
-        fillPatternScale={{ x: zoom / dpr, y: zoom / dpr }}
+        fillPatternScale={{ x: zoom / capture.scale_factor, y: zoom / capture.scale_factor }}
         stroke="white"
         strokeWidth={2}
       />

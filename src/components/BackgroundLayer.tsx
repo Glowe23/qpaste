@@ -10,8 +10,6 @@ export const BackgroundLayer = () => {
   const tool = useAppStore(state => state.tool);
 
 
-  const scale = 1 / window.devicePixelRatio;
-  
   React.useEffect(() => {
     // Force re-render when magnifier toggles
   }, [showMagnifier]);
@@ -32,10 +30,10 @@ export const BackgroundLayer = () => {
         <KonvaImage
           key={i}
           image={images[i]}
-          x={cap.x * scale}
-          y={cap.y * scale}
-          width={cap.width * scale}
-          height={cap.height * scale}
+          x={0}
+          y={0}
+          width={cap.width / cap.scale_factor}
+          height={cap.height / cap.scale_factor}
         />
       ))}
 
@@ -53,10 +51,10 @@ export const BackgroundLayer = () => {
           <KonvaImage
             key={`clip-${i}`}
             image={images[i]}
-            x={cap.x * scale}
-            y={cap.y * scale}
-            width={cap.width * scale}
-            height={cap.height * scale}
+            x={0}
+            y={0}
+            width={cap.width / cap.scale_factor}
+            height={cap.height / cap.scale_factor}
           />
         ))}
       </Group>

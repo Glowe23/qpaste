@@ -1,5 +1,9 @@
 # QPaste
 
+## This fork
+
+This repository is a derivative of [leon6002/qpaste](https://github.com/leon6002/qpaste). It adds Windows multi-monitor cursor targeting and mixed-DPI handling while preserving the original QPaste functionality.
+
 QPaste is a powerful, lightweight screen capture and annotation tool built with Tauri, React, and Rust. It allows you to quickly capture screenshots, annotate them with various tools, and copy or save the results.
 
 ## Features

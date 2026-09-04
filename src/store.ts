@@ -5,6 +5,7 @@ export interface Capture {
   y: number;
   width: number;
   height: number;
+  scale_factor: number;
   image_base64: string;
 }
 

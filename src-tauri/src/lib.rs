@@ -37,78 +37,85 @@ struct MonitorCapture {
 }
 
 #[tauri::command]
-async fn capture_screen(state: tauri::State<'_, AppState>) -> Result<Vec<MonitorCapture>, String> {
+async fn capture_screen(
+    x: i32,
+    y: i32,
+    state: tauri::State<'_, AppState>,
+) -> Result<Vec<MonitorCapture>, String> {
     let monitors = Monitor::all().map_err(|e| e.to_string())?;
-    let mut captures = Vec::new();
+    let monitor = monitors
+        .into_iter()
+        .find(|monitor| {
+            let mx = monitor.x();
+            let my = monitor.y();
+            let mw = monitor.width();
+            let mh = monitor.height();
+            x >= mx && x < mx + mw as i32 && y >= my && y < my + mh as i32
+        })
+        .ok_or_else(|| format!("No monitor contains cursor at ({x}, {y})"))?;
     let quality = *state.quality.lock().unwrap();
 
-    for monitor in monitors {
-        let x = monitor.x();
-        let y = monitor.y();
-        let scale_factor = monitor.scale_factor();
+    let x = monitor.x();
+    let y = monitor.y();
+    let scale_factor = monitor.scale_factor();
 
-        let image = monitor.capture_image().map_err(|e| e.to_string())?;
-        let width = image.width();
-        let height = image.height();
+    let image = monitor.capture_image().map_err(|e| e.to_string())?;
+    let width = image.width();
+    let height = image.height();
 
-        println!(
-            "Monitor: x={}, y={}, scale={}, image={}x{}",
-            x, y, scale_factor, width, height
-        );
+    println!(
+        "Monitor: x={}, y={}, scale={}, image={}x{}",
+        x, y, scale_factor, width, height
+    );
 
-        let mut bytes: Vec<u8> = Vec::new();
-        let mime_type;
+    let mut bytes: Vec<u8> = Vec::new();
+    let mime_type;
 
-        match quality {
-            ImageQuality::High => {
-                image
-                    .write_to(&mut Cursor::new(&mut bytes), image::ImageFormat::Png)
-                    .map_err(|e| e.to_string())?;
-                mime_type = "image/png";
-            }
-            ImageQuality::Medium => {
-                let mut cursor = Cursor::new(&mut bytes);
-                let mut encoder =
-                    image::codecs::jpeg::JpegEncoder::new_with_quality(&mut cursor, 75);
-                encoder
-                    .encode(
-                        image.as_raw(),
-                        image.width(),
-                        image.height(),
-                        image::ColorType::Rgba8.into(),
-                    )
-                    .map_err(|e| e.to_string())?;
-                mime_type = "image/jpeg";
-            }
-            ImageQuality::Low => {
-                let mut cursor = Cursor::new(&mut bytes);
-                let mut encoder =
-                    image::codecs::jpeg::JpegEncoder::new_with_quality(&mut cursor, 50);
-                encoder
-                    .encode(
-                        image.as_raw(),
-                        image.width(),
-                        image.height(),
-                        image::ColorType::Rgba8.into(),
-                    )
-                    .map_err(|e| e.to_string())?;
-                mime_type = "image/jpeg";
-            }
+    match quality {
+        ImageQuality::High => {
+            image
+                .write_to(&mut Cursor::new(&mut bytes), image::ImageFormat::Png)
+                .map_err(|e| e.to_string())?;
+            mime_type = "image/png";
         }
-
-        let base64_str = general_purpose::STANDARD.encode(&bytes);
-
-        captures.push(MonitorCapture {
-            x,
-            y,
-            width,
-            height,
-            scale_factor,
-            image_base64: format!("data:{};base64,{}", mime_type, base64_str),
-        });
+        ImageQuality::Medium => {
+            let mut cursor = Cursor::new(&mut bytes);
+            let mut encoder = image::codecs::jpeg::JpegEncoder::new_with_quality(&mut cursor, 75);
+            encoder
+                .encode(
+                    image.as_raw(),
+                    image.width(),
+                    image.height(),
+                    image::ColorType::Rgba8.into(),
+                )
+                .map_err(|e| e.to_string())?;
+            mime_type = "image/jpeg";
+        }
+        ImageQuality::Low => {
+            let mut cursor = Cursor::new(&mut bytes);
+            let mut encoder = image::codecs::jpeg::JpegEncoder::new_with_quality(&mut cursor, 50);
+            encoder
+                .encode(
+                    image.as_raw(),
+                    image.width(),
+                    image.height(),
+                    image::ColorType::Rgba8.into(),
+                )
+                .map_err(|e| e.to_string())?;
+            mime_type = "image/jpeg";
+        }
     }
 
-    Ok(captures)
+    let base64_str = general_purpose::STANDARD.encode(&bytes);
+
+    Ok(vec![MonitorCapture {
+        x,
+        y,
+        width,
+        height,
+        scale_factor,
+        image_base64: format!("data:{};base64,{}", mime_type, base64_str),
+    }])
 }
 
 #[tauri::command]

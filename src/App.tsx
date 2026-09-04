@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from '@tauri-apps/api/event';
-import { getCurrentWindow } from "@tauri-apps/api/window";
+import { cursorPosition, getCurrentWindow, monitorFromPoint, PhysicalPosition, PhysicalSize } from "@tauri-apps/api/window";
 import './App.css';
 import { useAppStore, Capture } from './store';
 import { Canvas } from './components/Canvas';
@@ -51,7 +51,16 @@ function App() {
     resetState();
     
     try {
-      const captures: Capture[] = await invoke("capture_screen");
+      const cursor = await cursorPosition();
+      const monitor = await monitorFromPoint(cursor.x, cursor.y);
+      if (!monitor) throw new Error(`No monitor found at (${cursor.x}, ${cursor.y})`);
+
+      const win = getCurrentWindow();
+      await win.setFullscreen(false);
+      await win.setPosition(new PhysicalPosition(monitor.position.x, monitor.position.y));
+      await win.setSize(new PhysicalSize(monitor.size.width, monitor.size.height));
+
+      const captures: Capture[] = await invoke("capture_screen", { x: cursor.x, y: cursor.y });
 
       const loadedImages = await Promise.all(captures.map(cap => {
         return new Promise<HTMLImageElement>((resolve, reject) => {
@@ -70,7 +79,6 @@ function App() {
       setCaptures(captures);
       setIsReady(true);
 
-      const win = getCurrentWindow();
       await win.show();
       await win.setFocus();
 
