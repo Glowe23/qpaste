@@ -1,76 +1,75 @@
-# QPaste
+# QPaste Multi-Monitor Fork
 
-## This fork
+QPaste is a lightweight Windows screen-capture and annotation tool built with Tauri, React, and Rust.
 
-This repository is a derivative of [leon6002/qpaste](https://github.com/leon6002/qpaste). It adds Windows multi-monitor cursor targeting and mixed-DPI handling while preserving the original QPaste functionality.
+This project is a new fork of [leon6002/qpaste](https://github.com/leon6002/qpaste). The original QPaste project provided multi-monitor capture support, but its single-window overlay behaved correctly on only one physical monitor in a Windows multi-monitor setup. I updated the application to make monitor selection reliable and to improve the experience across different display layouts and DPI settings.
 
-QPaste is a powerful, lightweight screen capture and annotation tool built with Tauri, React, and Rust. It allows you to quickly capture screenshots, annotate them with various tools, and copy or save the results.
+## What I Updated
+
+When QPaste is opened with `F1` or `Alt+Q`, it now:
+
+- Detects the physical monitor containing the mouse cursor.
+- Opens the overlay on that monitor instead of defaulting to the primary display.
+- Supports monitors positioned left, right, above, or below the primary display.
+- Handles negative Windows desktop coordinates correctly.
+- Handles mixed display scaling, including 100%, 125%, and 150% DPI.
+- Captures only the active monitor to reduce unnecessary work and improve responsiveness.
+- Keeps the screenshot aligned with the monitor's local coordinate system.
+
+The existing QPaste workflow remains available, including selection, annotations, magnification, clipboard copying, image saving, undo, keyboard shortcuts, system tray controls, and stored settings.
 
 ## Features
 
-*   **Global Shortcut**: Press `F1` to toggle the screenshot interface.
-*   **Multi-Monitor Support**: Seamlessly captures all connected monitors.
-*   **Annotation Tools**:
-    *   **Rectangle**: Draw rectangles to highlight areas.
-    *   **Arrow**: Point out specific details.
-    *   **Text**: Add text annotations with customizable font size and color.
-*   **Selection**: Drag to select a specific area to copy or save.
-*   **Clipboard Integration**: Copy the selected area directly to your clipboard.
-*   **Save to Disk**: Save the selected area as a PNG file.
-*   **Undo**: Undo your last annotation action.
-*   **Customization**: Choose from a palette of colors and adjust font sizes.
-*   **Cross-Platform**: Built on Tauri for a small footprint and high performance.
+- Global shortcuts: `F1` and `Alt+Q`
+- Cursor-aware multi-monitor capture
+- Mixed-DPI display support
+- Rectangle, arrow, and text annotations
+- Selection movement and resizing
+- Magnifier
+- Copy to clipboard
+- Save screenshots as PNG or JPEG
+- Undo
+- System tray controls
+- Configurable colors, fonts, and settings
+- Optional launch at startup
 
-## Tech Stack
+## Technology
 
-*   **Frontend**: React, TypeScript, Vite, Zustand (State Management), React-Konva (Canvas)
-*   **Backend**: Rust, Tauri
-*   **Styling**: CSS Modules / Vanilla CSS
+- Tauri 2
+- React 19
+- TypeScript
+- Rust
+- Zustand
+- React-Konva
+- xcap 0.0.14
 
 ## Development
 
 ### Prerequisites
 
-*   Node.js (pnpm recommended)
-*   Rust (Cargo)
+- Node.js
+- pnpm
+- Rust and Cargo
 
 ### Setup
 
-1.  Clone the repository:
-    ```bash
-    git clone https://github.com/leon6002/qpaste.git
-    cd qpaste
-    ```
+```bash
+git clone https://github.com/Glowe23/qpaste.git
+cd qpaste
+pnpm install
+pnpm tauri dev
+```
 
-2.  Install dependencies:
-    ```bash
-    pnpm install
-    ```
+To build the Windows application:
 
-3.  Run the development server:
-    ```bash
-    pnpm tauri dev
-    ```
+```bash
+pnpm tauri build
+```
 
-4.  Build the application:
-    ```bash
-    pnpm tauri build
-    ```
+## Attribution
 
-## Usage
-
-1.  Run the application.
-2.  Press `F1` to open the screenshot overlay.
-3.  Use the toolbar to select tools (Rectangle, Arrow, Text).
-4.  Draw on the screen.
-5.  Use the "Select" tool to drag a selection box around the area you want to capture.
-6.  Click "Copy" to copy to clipboard or "Save" to save to a file.
-7.  Press `Esc` or click the Close button to exit.
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
+This project is a derivative work based on [QPaste by leon6002](https://github.com/leon6002/qpaste). Credit goes to the original author for the application concept, foundation, and existing functionality. This fork focuses on Windows multi-monitor reliability, cursor-based monitor targeting, and mixed-DPI behavior.
 
 ## License
 
-MIT
+MIT. See [LICENSE](LICENSE).
