@@ -2,56 +2,39 @@
 
 QPaste is a lightweight Windows screen-capture and annotation tool built with Tauri, React, and Rust.
 
-This project is a new fork of [leon6002/qpaste](https://github.com/leon6002/qpaste). The original QPaste project provided multi-monitor capture support, but its single-window overlay behaved correctly on only one physical monitor in a Windows multi-monitor setup. I updated the application to make monitor selection reliable and to improve the experience across different display layouts and DPI settings.
+This repository is a fork of [QPaste by leon6002](https://github.com/leon6002/qpaste). The original project supplied the application foundation and core capture workflow. My contribution focuses on making the overlay behave correctly in real Windows multi-monitor setups.
 
-## What I Updated
+## The problem I worked on
 
-When QPaste is opened with `F1` or `Alt+Q`, it now:
+The original single-window overlay did not reliably open on the physical monitor containing the cursor. Windows multi-monitor layouts make this harder than it first appears because displays may sit left, right, above, or below the primary monitor, and desktop coordinates can be negative. Mixed display scaling adds a second coordinate system that must be handled explicitly.
 
-- Detects the physical monitor containing the mouse cursor.
-- Opens the overlay on that monitor instead of defaulting to the primary display.
-- Supports monitors positioned left, right, above, or below the primary display.
-- Handles negative Windows desktop coordinates correctly.
-- Handles mixed display scaling, including 100%, 125%, and 150% DPI.
-- Captures only the active monitor to reduce unnecessary work and improve responsiveness.
-- Keeps the screenshot aligned with the monitor's local coordinate system.
+## What I changed
 
-The existing QPaste workflow remains available, including selection, annotations, magnification, clipboard copying, image saving, undo, keyboard shortcuts, system tray controls, and stored settings.
+- Detect the physical monitor containing the cursor.
+- Open the overlay on that monitor instead of defaulting to the primary display.
+- Handle monitors positioned on any side of the primary display.
+- Handle negative Windows desktop coordinates.
+- Support mixed display scaling, including 100%, 125%, and 150% DPI.
+- Capture only the active monitor to reduce unnecessary work.
+- Keep desktop, window, canvas, and image coordinates separate.
 
-## Features
+The existing workflow remains available, including selection, annotations, magnification, clipboard copying, image saving, undo, keyboard shortcuts, system tray controls, and stored settings.
 
-- Global shortcuts: `F1` and `Alt+Q`
-- Cursor-aware multi-monitor capture
-- Mixed-DPI display support
-- Rectangle, arrow, and text annotations
-- Selection movement and resizing
-- Magnifier
-- Copy to clipboard
-- Save screenshots as PNG or JPEG
-- Undo
-- System tray controls
-- Configurable colors, fonts, and settings
-- Optional launch at startup
+## Why this was technically interesting
+
+The important part was not adding another drawing tool. It was keeping physical desktop pixels, logical window coordinates, canvas coordinates, and image pixels aligned across different monitor layouts and scale factors. The repository includes [multi-monitor implementation notes](MULTI_MONITOR_NOTES.md) describing those boundaries.
 
 ## Technology
 
 - Tauri 2
-- React 19
-- TypeScript
+- React 19 and TypeScript
 - Rust
-- Zustand
-- React-Konva
-- xcap 0.0.14
+- Zustand and React-Konva
+- `xcap` for screen capture
 
 ## Development
 
-### Prerequisites
-
-- Node.js
-- pnpm
-- Rust and Cargo
-
-### Setup
+Prerequisites: Node.js, pnpm, Rust, and Cargo.
 
 ```bash
 git clone https://github.com/Glowe23/qpaste.git
@@ -60,16 +43,18 @@ pnpm install
 pnpm tauri dev
 ```
 
-To build the Windows application:
+Build the Windows application with:
 
 ```bash
 pnpm tauri build
 ```
 
-## Attribution
+## What remains
 
-This project is a derivative work based on [QPaste by leon6002](https://github.com/leon6002/qpaste). Credit goes to the original author for the application concept, foundation, and existing functionality. This fork focuses on Windows multi-monitor reliability, cursor-based monitor targeting, and mixed-DPI behavior.
+The project still needs broader validation across Windows hardware, display-driver combinations, and additional DPI configurations. The current focus is multi-monitor reliability, not a claim of universal desktop compatibility.
 
-## License
+## Attribution and license
+
+This is a derivative work based on [QPaste by leon6002](https://github.com/leon6002/qpaste). Credit goes to the original author for the application concept, foundation, and existing functionality. This fork focuses on Windows multi-monitor reliability, cursor-based monitor targeting, and mixed-DPI behavior.
 
 MIT. See [LICENSE](LICENSE).
